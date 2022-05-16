@@ -5,9 +5,21 @@
     static int InfoCols = 10;
     static int ConsoleRows = 1 + TetrisRows + 1;
     static int ConsoleCols = 1 + TetrisCols + 1 + InfoCols + 1;
+    static List<bool[,]> TetrisFigures = new List<bool[,]>()
+    {
+
+    };
+
+
 
     // State
     static int Score = 0;
+    static int Frame = 0;
+    static int FramesToMoveFigure = 15;
+    static int CurrentFigureIndex = 2;
+    static int CurrentFigureRow = 0;
+    static int CurrentFigureCol = 0;
+    static bool[,] TetrisField = new bool[TetrisRows, TetrisCols];
 
     static void Main(string[] args)
     {
@@ -18,9 +30,11 @@
         Console.BufferHeight = ConsoleRows + 1;
         Console.BufferWidth = ConsoleCols;
 
+
+
         while (true)
         {
-            Score++;
+           
 
             if (Console.KeyAvailable)
             {
@@ -31,6 +45,32 @@
                     // Environment.Exit(0);
                     return; // Becase of Main()
                 }
+                if (key.Key == ConsoleKey.LeftArrow || key.Key == ConsoleKey.A)
+                {
+                    // TODO: Move current figure left
+                    CurrentFigureCol--; // TODO: Out of range
+                }
+                if (key.Key == ConsoleKey.RightArrow || key.Key == ConsoleKey.D)
+                {
+                    // TODO: Move current figure right
+                    CurrentFigureCol++; // TODO: Out of range
+                }
+                if (key.Key == ConsoleKey.DownArrow || key.Key == ConsoleKey.S)
+                {
+                    Frame = 1;
+                    Score++;
+                    CurrentFigureRow++;
+                    // TODO: Move current figure down
+                }
+                if (key.Key == ConsoleKey.Spacebar || key.Key == ConsoleKey.UpArrow || key.Key == ConsoleKey.W)
+                {
+                    // TODO: Implement 90-degree rotation of the current figure
+                }
+            }
+            if(Frame % FramesToMoveFigure == 0)
+            {
+                CurrentFigureRow++;
+                Frame = 0;
             }
             // user input
             // change state
@@ -38,7 +78,7 @@
             // Redraw UI
             DrawBorder();
             DrawInfo();
-
+            Frame++;
             Thread.Sleep(40);
         }
 
@@ -80,6 +120,9 @@
     {
         Write("Score:", 1, 3 + TetrisCols);
         Write(Score.ToString(), 2, 3 + TetrisCols);
+        Write("Frame:", 4, 3 + TetrisCols);
+        Write(Frame.ToString(), 5, 3 + TetrisCols);
+
     }
 
     static void Write(string text, int row, int col, ConsoleColor color = ConsoleColor.Green)
