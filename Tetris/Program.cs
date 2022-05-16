@@ -7,7 +7,40 @@
     static int ConsoleCols = 1 + TetrisCols + 1 + InfoCols + 1;
     static List<bool[,]> TetrisFigures = new List<bool[,]>()
     {
-
+                new bool[,] // ----
+                {
+                    { true, true, true, true }
+                },
+                new bool[,] // O
+                {
+                    { true, true },
+                    { true, true }
+                },
+                new bool[,] // T
+                {
+                  { false, true, false },
+                  { true, true, true },
+                },
+                new bool[,] // S
+                {
+                    { false, true, true, },
+                    { true, true, false, },
+                },
+                new bool[,] // Z
+                {
+                    { true, true, false },
+                    { false, true, true },
+                },
+                new bool[,] // J
+                {
+                    { true, false, false },
+                    { true, true, true }
+                },
+                new bool[,] // L
+                {
+                    { false, false, true },
+                    { true, true, true }
+                },
     };
 
 
@@ -34,8 +67,8 @@
 
         while (true)
         {
-           
 
+            Frame++;
             if (Console.KeyAvailable)
             {
                 var key = Console.ReadKey();
@@ -78,7 +111,8 @@
             // Redraw UI
             DrawBorder();
             DrawInfo();
-            Frame++;
+            DrawCurrentFigure();
+            
             Thread.Sleep(40);
         }
 
@@ -124,7 +158,20 @@
         Write(Frame.ToString(), 5, 3 + TetrisCols);
 
     }
-
+    static void DrawCurrentFigure()
+    {
+        var currentFigure = TetrisFigures[CurrentFigureIndex];
+        for (int row = 0; row < currentFigure.GetLength(0); row++)
+        {
+            for (int col = 0; col < currentFigure.GetLength(1); col++)
+            {
+                if (currentFigure[row,col])
+                {
+                    Write("*", row + 1 + CurrentFigureRow, col + 1 + CurrentFigureCol);
+                }
+            }
+        }
+    }
     static void Write(string text, int row, int col, ConsoleColor color = ConsoleColor.Green)
     {
         Console.ForegroundColor = color;
