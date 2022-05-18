@@ -1,4 +1,6 @@
-﻿class Program
+﻿using System.Text.RegularExpressions;
+
+class Program
 {
     static int TetrisRows = 20;
     static int TetrisCols = 10;
@@ -43,7 +45,8 @@
                 },
     };
 
-
+    static string ScoresFileName = "scores.txt";
+    static int[] ScorePerLines = { 0, 40, 100, 300, 1200 };
 
     // State
     static int HighScore = 0;
@@ -59,6 +62,17 @@
 
     static void Main(string[] args)
     {
+
+        if (File.Exists(ScoresFileName))
+        {
+            var allScores = File.ReadAllLines(ScoresFileName);
+            foreach (var score in allScores)
+            {
+                var match = Regex.Match(score, @" => (?<score>[0-9]+)");
+                HighScore = Math.Max(HighScore, int.Parse(match.Groups["score"].Value));
+            }
+        }
+
         Console.Title = "Tetris v1.0";
         Console.CursorVisible = false;
         Console.WindowHeight = ConsoleRows + 1;
@@ -119,6 +133,22 @@
                 CurrentFigure = TetrisFigures[Random.Next(0, TetrisFigures.Count)];
                 CurrentFigureRow = 0;
                 CurrentFigureCol = 0;
+                if(Collision(CurrentFigure))
+                {
+                    File.AppendAllLines(ScoresFileName, new List<string>
+                        {
+                            $"[{DateTime.Now.ToString()}] {Environment.UserName} => {Score}"
+                        });
+                    var scoreAsString = Score.ToString();
+                    scoreAsString += new string(' ', 7 - scoreAsString.Length);
+                    Write("╔═════════╗", 5, 5);
+                    Write("║ Game    ║", 6, 5);
+                    Write("║   over! ║", 7, 5);
+                    Write($"║ {scoreAsString} ║", 8, 5);
+                    Write("╚═════════╝", 9, 5);
+                    Thread.Sleep(100000);
+                    return;
+                }
             }
 
                 // Redraw UI
@@ -152,10 +182,12 @@
         {
             return true;
         }
-        if (CurrentFigureRow + CurrentFigure.GetLength(0) == TetrisRows)
+
+        if (CurrentFigureRow + figure.GetLength(0) == TetrisRows)
         {
             return true;
         }
+
         for (int row = 0; row < figure.GetLength(0); row++)
         {
             for (int col = 0; col < figure.GetLength(1); col++)
@@ -168,6 +200,7 @@
 
             }
         }
+
         return false;
     }
 
@@ -211,6 +244,8 @@
 
         Write("Score:", 1, 3 + TetrisCols);
         Write(Score.ToString(), 2, 3 + TetrisCols);
+        Write("Best:", 7, 3 + TetrisCols);
+        Write(HighScore.ToString(), 8, 3 + TetrisCols);
         Write("Frame:", 4, 3 + TetrisCols);
         Write(Frame.ToString(), 5, 3 + TetrisCols);
         Write("Position:", 13, 3 + TetrisCols);
