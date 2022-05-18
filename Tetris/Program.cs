@@ -72,7 +72,7 @@ class Program
                 HighScore = Math.Max(HighScore, int.Parse(match.Groups["score"].Value));
             }
         }
-
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.Title = "Tetris v1.0";
         Console.CursorVisible = false;
         Console.WindowHeight = ConsoleRows + 1;
@@ -130,6 +130,8 @@ class Program
             if (Collision(CurrentFigure))
             {
                 AddCurrentFigureToTetrisField();
+                int lines = CheckForFullLines();
+                Score += ScorePerLines[lines];
                 CurrentFigure = TetrisFigures[Random.Next(0, TetrisFigures.Count)];
                 CurrentFigureRow = 0;
                 CurrentFigureCol = 0;
@@ -161,8 +163,36 @@ class Program
         }
 
     }
+    private static int CheckForFullLines() 
+    {
+        int lines = 0;
 
-    static void AddCurrentFigureToTetrisField()
+        for (int row = 0; row < TetrisField.GetLength(0); row++)
+        {
+            bool rowIsFull = true;
+            for (int col = 0; col < TetrisField.GetLength(1); col++)
+            {
+                if (TetrisField[row, col] == false)
+                {
+                    rowIsFull = false;
+                    break;
+                }
+            }
+            if(rowIsFull)
+            {
+                for (int rowToMove = row; rowToMove >= 1; rowToMove--)
+                {
+                    for (int col = 0; col < TetrisField.GetLength(1); col++)
+                    {
+                        TetrisField[rowToMove, col] = TetrisField[rowToMove - 1, col];
+                    }
+                }
+                lines++;
+            }
+        }
+        return lines;
+    }
+        static void AddCurrentFigureToTetrisField()
     {
         for (int row = 0; row < CurrentFigure.GetLength(0); row++)
         {
@@ -291,12 +321,11 @@ class Program
             }
         }
     }
-    static void Write(string text, int row, int col, ConsoleColor color = ConsoleColor.Green)
+    static void Write(string text, int row, int col)
     {
-        Console.ForegroundColor = color;
         Console.SetCursorPosition(col, row);
         Console.WriteLine(text);
-        Console.ResetColor();
+        
     }
 
 }
