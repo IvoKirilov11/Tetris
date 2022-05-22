@@ -115,11 +115,11 @@ class Program
                     Frame = 1;
                     Score++;
                     CurrentFigureRow++;
-                    // TODO: Move current figure down
+                    
                 }
                 if (key.Key == ConsoleKey.Spacebar || key.Key == ConsoleKey.UpArrow || key.Key == ConsoleKey.W)
                 {
-                    // TODO: Implement 90-degree rotation of the current figure
+                    RotateCurrentFigure();
                 }
             }
             if(Frame % FramesToMoveFigure == 0)
@@ -162,6 +162,22 @@ class Program
             Thread.Sleep(40);
         }
 
+    }
+
+    private static void RotateCurrentFigure()
+    {
+        var newFigure = new bool[CurrentFigure.GetLength(1), CurrentFigure.GetLength(0)];
+        for (int row = 0; row < CurrentFigure.GetLength(0); row++)
+        {
+            for (int col = 0; col < CurrentFigure.GetLength(1); col++)
+            {
+                newFigure[col, CurrentFigure.GetLength(0) - row - 1] = CurrentFigure[row, col];
+            }
+        }
+        if (!Collision(newFigure))
+        {
+            CurrentFigure = newFigure;
+        }
     }
     private static int CheckForFullLines() 
     {
